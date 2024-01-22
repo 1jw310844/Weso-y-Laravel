@@ -15,12 +15,12 @@ class PeopleControllers extends Controller
     public function show($id)
     {
         $people = People::findorFail($id);
-        return view('page.show', compact('people'));
+        return response()->json($people);
     }
     public function index()
     {
         $people = People::all();
-        return view('page.index', compact('people'));
+        return response()->json($people);
     }
     public function create()
     {
@@ -28,51 +28,40 @@ class PeopleControllers extends Controller
     }
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'lastName' => 'required',
-            'phone_number' => 'required',
-            'street' => 'required',
-            'country' => 'required',
-           
-        ]);
-        People::create($request->all());
-        return view('page.create');
+        $people = new People();
+        $people->name = $request->name;
+        $people->lastName = $request->lastName;
+        $people->phone_number = $request->phone_number;
+        $people->street = $request->street;
+        $people->country = $request->country;
+
+        $people->save();
+        return response()->json($people);
         
     }
     public function destroy($id)
     {
         $people = People::findorFail($id);
         $people->delete();
-        return $people;
+        return response()->json($people);
     }
     public function update($id)
     {
-        $people = People::findorFail($id);
-        return view('page.update',['People'=>$people]);
+        return csrf_token();
     }
     public function update2(Request $request)
     {
         
-        $request->validate([
-            'name' => 'required',
-            'lastName' => 'required',
-            'phone_number' => 'required',
-            'street' => 'required',
-            'country' => 'required',
-           
-        ]);
+        $people = People::findorFail($request->id);
         
-       
-        
-        DB::table('People')->where('id',$request['id'])->update(['name' => $request['name']]);
-        DB::table('People')->where('id',$request['id'])->update(['lastName' => $request['lastName']]);
-        DB::table('People')->where('id',$request['id'])->update(['phone_number' => $request['phone_number']]);
-        DB::table('People')->where('id',$request['id'])->update(['country' => $request['country']]);
-        DB::table('People')->where('id',$request['id'])->update(['street' => $request['street']]);
-        
+        $people->name = $request->name;
+        $people->lastName = $request->lastName;
+        $people->phone_number = $request->phone_number;
+        $people->street = $request->street;
+        $people->country = $request->country;
 
-        
+        $people->update();
+        return response()->json($people);
     }
     
 }
